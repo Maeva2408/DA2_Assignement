@@ -25,6 +25,6 @@ pop_raw <- WDI(indicator=c('SP.POP.TOTL'),
 # Save the raw files
 my_path <- "C:/Users/mbrae/OneDrive/Bureau/CEU/DA2/DA2_Assignement/Data/"
 # covid data
-write_csv(covid_raw, paste0(my_path,'raw/covid_1026__2020_raw.csv'))
+write_csv(covid_raw, paste0(my_path,'raw/covid_10_26_2020_raw.csv'))
 # population data
 write_csv(pop_raw, paste0(my_path,'raw/pop_WDI_2019.csv'))
