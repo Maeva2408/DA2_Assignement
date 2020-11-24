@@ -1,54 +1,30 @@
-#######################
-## Analysis of       ##
-##  Life expectancy  ##
-##    and            ##
-##  GPD/capita       ##
-##                   ##
-##      NO. 1        ##
-##                   ##
-##  Getting the data ##
-##                   ##
-#######################
+########################
+## Assignment for DA2 ##
+##  and for Coding    ##
+##                    ##
+##   NO. 1            ##
+## Get the data       ##
+########################
 
 
-# Clear memory
+# Clear memory and call packages
 rm(list=ls())
-
-# Call packages
-install.packages('WDI')
 library(WDI)
 library(tidyverse)
 
+# Download COVID cross-sectional data
+date <- '10-25-2020'
+covid_url <- paste0('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/',
+                    date,'.csv')
+covid_raw <- read.csv(covid_url)
 
+# Download population data for 2019
+pop_raw <- WDI(indicator=c('SP.POP.TOTL'), 
+               country="all", start=2019, end=2019)
 
-
-#####
-my_url <- "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/10-25-2020.csv"
-read.csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/10-25-2020.csv")
-df <- read_csv( my_url )
-
-
-
-# How WDI works - it is an API
-# Search for variables which contains GDP
-a <- WDIsearch('population')
-
-# Get data
-pop_data = WDI(indicator='SP.POP.TOTL', country="all", start=2019, end=2019)
-
-
-a <- WDIsearch('population, total')
-b <- WDIsearch('life expectancy at birth')
-
-
-
-# Save the raw data file
-my_path <- "C:/Users/mbrae/OneDrive/Bureau/CEU/DA2/DA2_Assignement/Data"
-write_csv(pop_data, paste0(my_path,'/raw/WDI_pop_raw.csv'))
-my_path <- "C:/Users/mbrae/OneDrive/Bureau/CEU/DA2/DA2_Assignement/Data"
-write_csv(df, paste0(my_path,'/raw/Covid_case_raw.csv'))
-# I have pushed it to Github, we will use that!
-
-# Note this is only the raw files! I am cleaning them in a separate file and save the results to the clean folder!
-
-
+# Save the raw files
+my_path <- "C:/Users/mbrae/OneDrive/Bureau/CEU/DA2/DA2_Assignement/Data/"
+# covid data
+write_csv(covid_raw, paste0(my_path,'raw/covid_1026__2020_raw.csv'))
+# population data
+write_csv(pop_raw, paste0(my_path,'raw/pop_WDI_2019.csv'))
