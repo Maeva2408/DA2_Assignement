@@ -339,7 +339,6 @@ ggplot(data = df_covid, aes(x = ln_confirmed, y = ln_deaths)) +
 
 ```
 
-## Model summary statistics
 
 ```{r, message = FALSE, echo=FALSE,warning=FALSE, size=1, fig.height=4, out.width = "50%"}
 df_covid_stat <- export_summs(reg1,reg2,reg3,reg4,

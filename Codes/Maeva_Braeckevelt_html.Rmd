@@ -1,0 +1,352 @@
+---
+title: "COVID-19 Analysis"
+author: "Maeva Braeckevelt"
+output:
+  html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Executive summary
+This analysis aimed at analyzing the pattern of association between registered COVID-19 cases and registered death due to COVID-19 until the 26 October 2020 among countries. The data used was gathered both by the Center for Systems Science and Engineering and the World Bank'sites. The main variables that I used were: total of registered number (per thousand people), total of death (per thousand people) and the population (per millions). The regression model chosen was the Log-Log Weighted Linear regression. It showed a linear pattern between death and confirmed case, such as, for people among all countries, for +10% change in registered COVID-19 case, there is an association of +9,5% change in registered Covid-19 deaths. However, this analysis is subject to the the politics testing of every country (mass testing, few tests, etc.).
+
+```{r, include=F, message=FALSE, echo=FALSE, eval=TRUE}
+# Packages to use
+library(tidyverse)
+require(scales)
+library(lspline)
+library(estimatr)
+library(texreg)
+library(ggthemes)
+library(tidyverse)
+library(geosphere)
+library(moments)
+library(dplyr)
+library(knitr)
+library(pander)
+library(jtools)
+library(huxtable)
+
+# First, I will import ly clean data from github
+my_url <- "https://raw.githubusercontent.com/Maeva2408/DA2_Assignement/main/Data/Clean/covid_pop_10_26_2020_clean.csv"
+df_covid <- read_csv( my_url )
+```
+
+# Introduction
+
+The aim of this project is to analyze the pattern of association between the confirmed case of Covid-19 and the death du to it. 
+The variables I will use in this analysis are the confirmed case per thousand people (x), deaths per thousand people (y) and the population in millions of 170 countries until the 26/10/2020. The population is all the covid-19 confirmed case and all the death due to it. There are 195 countries in the world, so my sample of 170 is representative. However, the quality of my data depends of the accuracy of the counting done by every country. We can't be sure that every country had the same counting process.
+
+# Observations
+To simplify the understanding of my analysis, I have decided to drop the countries that have 0 death. It only represent 7% of the data so I will focus on the majority of non-zero values. I decided to  convert my cases confirmed and of deaths per 1000 people, and my population by millions. These conversion will help the clarity of the analysis and give me the possibility of using the log-transformation if needed.
+
+
+```{r, include=F, message=FALSE, echo=FALSE, eval=TRUE}
+View( df_covid %>% filter( death==0) ) 
+# Drop if death is 0
+df_covid <- df_covid %>% filter( !(death==0) ) 
+#New scale
+df_covid <- df_covid %>% transmute( country = country,
+                       confirmed = confirmed/1000,
+                       deaths    =  death/1000,
+                       recovered = recovered/1000,
+                       active    = active/1000,
+                         population = population/1000000)
+```
+# Histogram and summary statitics
+```{r, eval=TRUE, echo=FALSE, results='asis'}
+df_covid_confirmed <- summarise(df_covid,
+                                    variable = "Case confirmed",
+                                    mean = mean(x = confirmed),
+                                    median = median(x = confirmed),
+                                    min= min(x = confirmed),
+                                    max = max(x = confirmed),
+                                    sd = sd(x = confirmed),
+                                    skew = skewness(x = confirmed))
+df_covid_deaths <- summarise(df_covid,
+                                variable = "case of death",
+                                mean = mean(x = deaths),
+                                median = median(x = deaths),
+                                min= min(x = deaths),
+                                max = max(x = deaths),
+                                sd = sd(x = deaths),
+                                skew = skewness(x = deaths))
+
+table_summary <- add_row(df_covid_confirmed,df_covid_deaths)
+kable(table_summary, caption = "Summary statistics")
+```
+
+```{r, echo=FALSE, dodge-st, fig.show = "hold", out.width = "50%", message=FALSE}
+df_covid %>% 
+  keep(is.numeric) %>%
+  ggplot(aes(x= confirmed))+
+  geom_histogram(fill= "orangered4", col= "salmon")+
+  theme_bw()+
+  scale_fill_wsj()+
+  labs(x = "Total of registered case (26/10/2020)",y = "count of registered case  (26/10/2020)", title = "Frequency of the confirmed cases of COVID-19 among countries ")
+
+df_covid %>% 
+  keep(is.numeric) %>%
+  ggplot(aes(x= deaths))+
+  geom_histogram(fill= "orangered4", col= "salmon")+
+  theme_bw()+
+  scale_fill_wsj()+
+  labs(x = "Total of registered death (26/10/2020)",y = "Count of registered case  (26/10/2020)", title = "Frequency of the case of deaths of COVID-19 among countries")
+```
+
+The summary statistic does not take to account the size of the population of the countries, so the interpretation is less meaningful. There is very small and very big population. But I observed some similarities between the two variables : they both are skewed with a right tail and some extreme values. The median of both are significantly smaller than the mean. The majority of the countries has low value.
+Although those variable share the same tendency, the scale is very different between them.
+I can already sense that I will have to find a way to weight the population to be able to have a relevant analysis.
+
+# Transformation of the variables
+
+To uncover the trend of the pattern association, I investigated four non-parametric regressions : level-level (figure A1 in the appendix), log-level (A2), level-log (A3), log-log(A4). I chose to use the fourth model (A4) : use Log transformation for both of my variables. 
+
+**Substantive reasons : ** the COVID-19 is a very contagious disease, one person can infect multiple people, so the variable are affected in multiplicative ways. The graph itself fits better for the interpretation. Also, we are looking for percentage association.
+
+**Statistical reasons:** The distributions of the variables are skewed with a long right tail. So taking the log is good solution to make the distribution of my transformed variable more symmetric.
+In addition,my variables have the same metric so for the purpose of comparison, taking log for both is easier.
+The graph (A4) can be interpret in a meaningful way and give a good prediction.
+
+# Model choice and interpretation
+The regression model that I have chosen is the Log-Log Weighted Linear regression : weight by coutries' population.
+It sounded pertinent that bigger population has a bigger impact on the slope.
+Please find in the appendix the estimation of the different models and the argumentation.
+
+**Formula :  ln_death = -3,39 + 0,95 * ln_confirmed, weights: countries'population**
+          
+**Alpha** : -3,39 is the average of ln_death when the confirmed case is one (ln(1)=0). 
+**Beta** : the deaths is 9,5 percent higher on average for observation having 10 percent higher case confirmed
+In log-log transformation, alpha is usually not meaningfull.
+The deaths is not increasing as fast as the confirmed cases.
+The graph (A8) shows that bigger the population is bigger are the cases of deaths. It will be very interesting to transform the variable per capita. This way, I could take out the bias having more deaths by higher population.
+\newpage
+
+# Hypothesis testing on Beta
+```{r, eval=TRUE, echo=FALSE, results='asis'}
+cutoff <- c(1,200)
+cutoff_ln<- log( cutoff )
+df_covid <- df_covid %>% mutate( ln_confirmed = log( confirmed), ln_deaths = log(deaths) )
+df_covid <- df_covid %>% mutate( ln_confirmed_sq = ln_confirmed^2 )
+reg1 <- lm_robust( ln_deaths ~ ln_confirmed , data = df_covid , se_type = "HC2" )
+reg2 <- lm_robust( ln_deaths ~ ln_confirmed + ln_confirmed_sq , data = df_covid )
+reg3 <- lm_robust(ln_deaths ~ lspline( ln_confirmed , cutoff_ln ), data = df_covid )
+reg4 <- lm_robust(ln_deaths ~ ln_confirmed, data = df_covid , weights = population)
+
+df_covid_hyp <- as.data.frame( summary( reg4 )[[12]])
+kable(df_covid_hyp, caption = "Hypothesis testing on β")
+
+```
+H0 : there is no pattern association between deaths and confirmed cases.
+
+HA : there is a pattern of association between deaths and confirmed cases.
+
+I chose 95% confidence interval for the hypothesis testing. My confidence interval is not crossing 0, so it means that it is significant. My p value is < 0,05 so I can reject my HO and therefore there is a pattern of association between deaths and confirmed cases on the 26/10/2020. 
+$$H_{A}: {β}\neq{0}$$
+
+# Analysis of the residuals
+```{r, echo=FALSE, fig.show = "hold", out.width = "50%", message=FALSE}
+df_covid$reg4_y_pred <- reg4$fitted.values
+df_covid$reg4_res <- df_covid$ln_deaths - df_covid$reg4_y_pred 
+
+df_covid_nerror <- df_covid %>% top_n( -5 , reg4_res ) %>% 
+  select( country , ln_deaths , reg4_y_pred , reg4_res )
+kable(df_covid_nerror, caption = "List of the 5 countries with the largest negative errors" )
+
+``` 
+For this 5 countries, the model overestimated the deaths. I can see that the predicted value is smaller than the real value. 
+For example, for Liechtenstein , the ln_deaths is equal -6,91, but the predicted value for is -4.35 so the predicted value is off by -2,56. So those countries have less death than the average. There could be a lot of explanation for it : better healthcare, less sensitif to covid19 (young people), isolation, etc.
+```{r, echo=FALSE, fig.show = "hold", out.width = "50%", message=FALSE}
+df_covid_perror <- df_covid %>% top_n( 5 , reg4_res ) %>% 
+  select( country , ln_deaths , reg4_y_pred , reg4_res )
+
+kable(df_covid_perror, caption= "List of 5 countries with the largest positive errors")
+
+``` 
+For this 5 countries, the model underestimated the deaths. I can see that the predicted value is bigger than the real value. For Italy, the ln_deaths is equal to 3,62, the predicted value is 2,55 so the predicted value is off by +1,06. So, Italy has more deaths than the average. It could be due to the way they handle the pandemic, or the bad healthcare, or old population, etc
+
+\newpage
+
+# Appendix
+
+This appendix contains the documentation of the analysis annoted.
+
+
+
+## Investigation of the transformation of the variable
+
+
+
+
+```{r, echo=FALSE, fig.show = "hold", out.width = "50%", message=FALSE}
+
+ggplot( df_covid , aes(x = confirmed, y = deaths)) +
+  geom_point(color = 'salmon') +
+  geom_smooth(method="loess", color = 'orangered4')+
+  theme_bw()+
+  labs(x = "Total of registered death (26/10/2020)",y = "Total of registered case  (26/10/2020)", 
+       title = "A1 :level-level model without scaling,  case confirmed - deaths by country ")
+
+ggplot( df_covid , aes(x = confirmed, y = deaths)) +
+  geom_point(color = 'salmon') +
+  geom_smooth(method="loess", color = 'orangered4')+
+  theme_bw()+
+  labs(x = "Total of registered death (26/10/2020,ln scale )",y = "Total of registered case  (26/10/2020)",
+title = "A2 :log - level, log(case confirmed)- deaths by country") +
+  scale_y_continuous( trans = log_trans(),  breaks = c(1,2,5,10,20,50,100,200,1000,10000) )
+
+```
+
+
+
+
+
+
+
+
+
+
+```{r, echo=FALSE, fig.show = "hold", out.width = "50%", message=FALSE}
+ggplot( df_covid , aes(x = confirmed, y = deaths)) +
+  geom_point(color = 'salmon') +
+  geom_smooth(method="loess",color = 'orangered4' )+
+  theme_bw()+
+  labs(x = "Total of registered case confirmed (26/10/2020,ln scale )",y = "Total of registered death (26/10/2020)",
+       title = "A3 : Level - Log, case confirmed - log (deaths) by country") +
+  scale_x_continuous( trans = log_trans(),  breaks = c(1,2,5,10,20,50,100,200,500,1000,10000) )
+
+ggplot( df_covid , aes(x = confirmed, y = deaths ))  +
+  geom_point(color = 'salmon') +
+  geom_smooth(method="loess",color = 'orangered4')+
+  theme_bw()+
+  labs(x = "Total of registered death (26/10/2020, ln scale )",y = "Total of registered case (26/10/2020, ln scale)",
+       title = "A4 : log - log , log(case confirmed) - log (deaths) by coountry") +
+  scale_x_continuous( trans = log_trans(),  breaks = c(1,2,5,10,20,50,100,200,500,1000,10000) )+
+  scale_y_continuous( trans = log_trans(),breaks = c(1,2,5,10,20,50,100,200,500,1000,10000 ))
+
+```
+
+## Estimating different models
+
+I estimated fourth model : Simple linear regression (A5), quadric linear regression (A6), Piecewise linear spline regression (A7) and Weighted linear regression : weight with population (A8).
+
+### Simple Linear regression (A5)
+
+This graph represents the simple linear regression between the confirmed cases and the death due to COVID-19 until the 26/10/2020.
+
+The formula is ln_death = -4,12 + 1,03 * ln_confirmed
+
+**Alpha** : -4,01 is the average of ln_death when the confirmed case is one (ln(1)=0). 
+
+**Beta** : the deaths is 10,3 percent higher on average for observation having 10 percent higher case confirmed
+
+In log-log transformation, alpha is usually not meaningfull.
+The deaths is increasing faster than the confirmed cases.
+
+The adjusted R squared is 0,89. That's a trustful model.
+
+### Quadric Linear regression (A6)
+
+This graph represents the quadric linear regression between the confirmed cases and the death due to COVID-19 until the 26/10/2020.
+
+The formula is ln_death = -4,01 + 0,88 * ln_confirmed + 0,02 * ln_confirmed^2
+
+Quadric Linear Regression is very hard to interpret
+The deaths is not increasing as fast as the confirmed cases.
+
+The adjusted R squared is 0,89. That's a trustful model
+
+### Piecewise linear spline regression (A7)
+
+This graph represents Piecewise linear spline regression between the confirmed cases and the death due to COVID-19 until the 26/10/2020. I chose two cut-off, the first at one, the second at 200.
+
+The formula is ln_deaths = -4,06 + 0,91 * ln_confirmed * 1(confirmed < 1) + 0,99* l n_confirmed * 1(1 <= confirmed < 200) + 1,28 * ln_confirmed* 1(confirmed >= 200)
+
+On the graph A7, thanks to the cut off, I can observed that the line is becoming steeper.
+The deaths is not increasing as fast as the confirmed cases.
+The adjusted R squared is 0,89. That's a trustful model
+
+### Weighted Linear regression : weight with population
+
+This graph represents the Weighted Linear regression : weight with population between the confirmed cases and the death due to COVID-19 until the 26/10/2020.
+
+The formula is ln_death = -3,39 + 0,95 * ln_confirmed
+
+**Alpha** : -3,39 is the average of ln_death when the confirmed case is one (ln(1)=0). 
+
+**Beta** : the deaths is 9,5 percent higher on average for observation having 10 percent higher case confirmed
+
+In log-log transformation, alpha is usually not meaningfull.
+The deaths is not increasing as fast as the confirmed cases.
+I can observe than the countries with the more deaths and confirmed cases are the country with a large population.
+The adjusted R squared is 0,93. That's a trustful model.
+
+
+### Model Chosen Weighted Linear regression : weight with population
+
+I chose the Weighted Linear regression : weight with population. 
+
+**Statistical reasons**: The adjusted R square of the model is the highest, so it's the model that fits the best. I excluded the PLS and the quadric function, for model complexity reasons.
+
+**Sustantive reasons** : I can see a 0.8 difference between the slope of the linear regression and the slope of the weighted regression, it means that not taking into account the different size of population increase the slope and the predicted deaths. So, I think the pertinent choice is the weight regression.
+
+## Graphs and Model summary statistics
+
+```{r, echo=FALSE, fig.show = "hold", out.width = "50%", message=FALSE}
+df_covid <- df_covid %>% mutate( ln_confirmed = log( confirmed), ln_deaths = log(deaths) )
+df_covid <- df_covid %>% mutate( ln_confirmed_sq = ln_confirmed^2 )
+
+
+ggplot( data = df_covid, aes( x = ln_confirmed, y = ln_deaths ) ) + 
+  geom_point( color='salmon') +
+  theme_bw()+
+  geom_smooth( method = lm , color = 'orangered4' )+
+  labs(x = "Total of registered death (26/10/2020, ln scale )",y = "Total of registered case (26/10/2020, ln scale)",
+       title = "A5 : Simple linear regression") 
+
+ggplot( data = df_covid, aes( x = ln_confirmed, y = ln_deaths ) ) + 
+  geom_point( color='salmon') +
+  theme_bw()+
+  geom_smooth( formula = y ~ poly(x,2) , method = lm , color = 'orangered4' )+
+  labs(x = "Total  of registered death (26/10/2020, ln scale )",y = "Total  of registered case (26/10/2020, ln scale)",
+       title = "A6 : Quadratic linear regression")
+
+```
+
+
+```{r, echo=FALSE, fig.show = "hold", out.width = "50%", message=FALSE}
+cutoff <- c(1,200)
+cutoff_ln<- log( cutoff )
+
+ggplot( data = df_covid, aes( x = ln_confirmed, y = ln_deaths ) ) + 
+  geom_point( color='salmon') +
+  theme_bw()+
+  geom_smooth( formula = y ~ lspline(x,cutoff_ln) , method = lm , color = 'orangered4' )+
+  labs(x = "Total  of registered death (26/10/2020, ln scale )",y = "Total  of registered case (26/10/2020, ln scale)", 
+       title = "A7 : Piecewise linear spline regression") 
+
+
+ggplot(data = df_covid, aes(x = ln_confirmed, y = ln_deaths)) +
+  geom_point(data = df_covid, aes(size=population),  color = 'salmon', shape = 16, alpha = 0.6,  show.legend=F) +
+  geom_smooth(aes(weight = population), method = "lm", color='orangered4')+
+  theme_bw()+
+  scale_size(range = c(1, 15)) +
+  labs(x = "Total  of registered death (26/10/2020, ln scale )",y = "Total  of registered confirmed (26/10/2020, ln scale)", title = "A8 : Weighted linear regression : weight with population") 
+
+
+```
+
+
+```{r, message = FALSE, echo=FALSE,warning=FALSE, size=1, fig.height=4, out.width = "50%"}
+df_covid_stat <- export_summs(reg1,reg2,reg3,reg4,
+                              model.names = c( "Linear","Quadratic", "PLS",
+                                 "weighted linear"),
+                              caption= "model summary statistics")
+as_hux(df_covid_stat)
+
+
+```
+
+
