@@ -5,13 +5,13 @@ Maeva Braeckevelt
 This analysis aimed at analyzing the pattern of association between registered COVID-19 cases and registered death due to COVID-19 until the 26 October 2020 among countries.
 
 # Analytic plan #
-In this folder, you can find R scripts, Rmd scripts used in my project.
+In this folder, you can find R scripts and Rmd scripts used in my project.
 
 ## Getting the data
-* covid_pop_getdata is a .R that helps me to import the data from WDI and CSSEGI
+* covid_pop_getdata is a .R that helped me to import the data from WDI and CSSEGI
 
 ## Cleaning the data
-* Clean_covid_data is a .R that helps me cleaning and merging the data together
+* Clean_covid_data is a .R that helped me cleaning and merging the data together
 
 ## COVID-19 Analysis 
 * Covid_analysis is a .R with my COVID-19 analysis
