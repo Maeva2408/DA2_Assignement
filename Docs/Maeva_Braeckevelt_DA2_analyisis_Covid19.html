@@ -429,7 +429,7 @@ summary {
 <h1>Model choice and interpretation</h1>
 <p>The regression model that I have chosen is the Log-Log Weighted Linear regression : weight by coutries’ population. It sounded pertinent that bigger population has a bigger impact on the slope. Please find in the appendix the estimation of the different models and the argumentation.</p>
 <p><strong>Formula : ln_death = -3,39 + 0,95 * ln_confirmed, weights: countries’population</strong></p>
-<p><strong>Alpha</strong> : -3,39 is the average of ln_death when the confirmed case is one (ln(1)=0). <strong>Beta</strong> : the deaths is 9,5 percent higher on average for observation having 10 percent higher case confirmed In log-log transformation, alpha is usually not meaningfull. The deaths is not increasing as fast as the confirmed cases. The graph (A8) shows that bigger the population is bigger are the cases of deaths. It will be very interesting to transform the variable per capita. This way, I could take out the bias having more deaths by higher population. </p>
+<p><strong>Alpha</strong> : -3,39 is the average of ln_death when the confirmed case is one (ln(1)=0). <strong>Beta</strong> : the deaths is 9,5 percent higher on average for observation having 10 percent higher case confirmed In log-log transformation, alpha is usually not meaningfull. The deaths are not increasing as fast as the confirmed cases. The graph (A8) shows that bigger the population is bigger are the cases of deaths. It will be very interesting to transform the variable per capita. This way, I could take out the bias having more deaths by higher population. </p>
 </div>
 <div id="hypothesis-testing-on-beta" class="section level1">
 <h1>Hypothesis testing on Beta</h1>
@@ -583,21 +583,21 @@ summary {
 <p>The formula is ln_death = -4,12 + 1,03 * ln_confirmed</p>
 <p><strong>Alpha</strong> : -4,01 is the average of ln_death when the confirmed case is one (ln(1)=0).</p>
 <p><strong>Beta</strong> : the deaths is 10,3 percent higher on average for observation having 10 percent higher case confirmed</p>
-<p>In log-log transformation, alpha is usually not meaningfull. The deaths is increasing faster than the confirmed cases.</p>
+<p>In log-log transformation, alpha is usually not meaningful. The deaths are increasing faster than the confirmed cases.</p>
 <p>The adjusted R squared is 0,89. That’s a trustful model.</p>
 </div>
 <div id="quadric-linear-regression-a6" class="section level3">
 <h3>Quadric Linear regression (A6)</h3>
 <p>This graph represents the quadric linear regression between the confirmed cases and the death due to COVID-19 until the 26/10/2020.</p>
 <p>The formula is ln_death = -4,01 + 0,88 * ln_confirmed + 0,02 * ln_confirmed^2</p>
-<p>Quadric Linear Regression is very hard to interpret The deaths is not increasing as fast as the confirmed cases.</p>
+<p>Quadric Linear Regression is very hard to interpret The deaths are not increasing as fast as the confirmed cases.</p>
 <p>The adjusted R squared is 0,89. That’s a trustful model</p>
 </div>
 <div id="piecewise-linear-spline-regression-a7" class="section level3">
 <h3>Piecewise linear spline regression (A7)</h3>
 <p>This graph represents Piecewise linear spline regression between the confirmed cases and the death due to COVID-19 until the 26/10/2020. I chose two cut-off, the first at one, the second at 200.</p>
 <p>The formula is ln_deaths = -4,06 + 0,91 * ln_confirmed * 1(confirmed &lt; 1) + 0,99* l n_confirmed * 1(1 &lt;= confirmed &lt; 200) + 1,28 * ln_confirmed* 1(confirmed &gt;= 200)</p>
-<p>On the graph A7, thanks to the cut off, I can observed that the line is becoming steeper. The deaths is not increasing as fast as the confirmed cases. The adjusted R squared is 0,89. That’s a trustful model</p>
+<p>On the graph A7, thanks to the cut off, I can observed that the line is becoming steeper. The deaths are not increasing as fast as the confirmed cases. The adjusted R squared is 0,89. That’s a trustful model</p>
 </div>
 <div id="weighted-linear-regression-weight-with-population" class="section level3">
 <h3>Weighted Linear regression : weight with population</h3>
@@ -605,7 +605,7 @@ summary {
 <p>The formula is ln_death = -3,39 + 0,95 * ln_confirmed</p>
 <p><strong>Alpha</strong> : -3,39 is the average of ln_death when the confirmed case is one (ln(1)=0).</p>
 <p><strong>Beta</strong> : the deaths is 9,5 percent higher on average for observation having 10 percent higher case confirmed</p>
-<p>In log-log transformation, alpha is usually not meaningfull. The deaths is not increasing as fast as the confirmed cases. I can observe than the countries with the more deaths and confirmed cases are the country with a large population. The adjusted R squared is 0,93. That’s a trustful model.</p>
+<p>In log-log transformation, alpha is usually not meaningful. The deaths are not increasing as fast as the confirmed cases. I can observe than the countries with the more deaths and confirmed cases are the country with a large population. The adjusted R squared is 0,93. That’s a trustful model.</p>
 </div>
 <div id="model-chosen-weighted-linear-regression-weight-with-population" class="section level3">
 <h3>Model Chosen Weighted Linear regression : weight with population</h3>

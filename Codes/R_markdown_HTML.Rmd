@@ -2,8 +2,7 @@
 title: "COVID-19 Analysis"
 author: "Maeva Braeckevelt"
 output:
-  pdf_document:
-    latex_engine: xelatex
+  html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -121,7 +120,7 @@ Please find in the appendix the estimation of the different models and the argum
 **Alpha** : -3,39 is the average of ln_death when the confirmed case is one (ln(1)=0). 
 **Beta** : the deaths is 9,5 percent higher on average for observation having 10 percent higher case confirmed
 In log-log transformation, alpha is usually not meaningfull.
-The deaths is not increasing as fast as the confirmed cases.
+The deaths are not increasing as fast as the confirmed cases.
 The graph (A8) shows that bigger the population is bigger are the cases of deaths. It will be very interesting to transform the variable per capita. This way, I could take out the bias having more deaths by higher population.
 \newpage
 
@@ -243,8 +242,8 @@ The formula is ln_death = -4,12 + 1,03 * ln_confirmed
 
 **Beta** : the deaths is 10,3 percent higher on average for observation having 10 percent higher case confirmed
 
-In log-log transformation, alpha is usually not meaningfull.
-The deaths is increasing faster than the confirmed cases.
+In log-log transformation, alpha is usually not meaningful.
+The deaths are increasing faster than the confirmed cases.
 
 The adjusted R squared is 0,89. That's a trustful model.
 
@@ -255,7 +254,7 @@ This graph represents the quadric linear regression between the confirmed cases 
 The formula is ln_death = -4,01 + 0,88 * ln_confirmed + 0,02 * ln_confirmed^2
 
 Quadric Linear Regression is very hard to interpret
-The deaths is not increasing as fast as the confirmed cases.
+The deaths are not increasing as fast as the confirmed cases.
 
 The adjusted R squared is 0,89. That's a trustful model
 
@@ -266,7 +265,7 @@ This graph represents Piecewise linear spline regression between the confirmed c
 The formula is ln_deaths = -4,06 + 0,91 * ln_confirmed * 1(confirmed < 1) + 0,99* l n_confirmed * 1(1 <= confirmed < 200) + 1,28 * ln_confirmed* 1(confirmed >= 200)
 
 On the graph A7, thanks to the cut off, I can observed that the line is becoming steeper.
-The deaths is not increasing as fast as the confirmed cases.
+The deaths are not increasing as fast as the confirmed cases.
 The adjusted R squared is 0,89. That's a trustful model
 
 ### Weighted Linear regression : weight with population
@@ -279,8 +278,8 @@ The formula is ln_death = -3,39 + 0,95 * ln_confirmed
 
 **Beta** : the deaths is 9,5 percent higher on average for observation having 10 percent higher case confirmed
 
-In log-log transformation, alpha is usually not meaningfull.
-The deaths is not increasing as fast as the confirmed cases.
+In log-log transformation, alpha is usually not meaningful.
+The deaths are not increasing as fast as the confirmed cases.
 I can observe than the countries with the more deaths and confirmed cases are the country with a large population.
 The adjusted R squared is 0,93. That's a trustful model.
 

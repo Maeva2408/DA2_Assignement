@@ -52,9 +52,8 @@ df_covid <- read_csv( my_url )
 ######
 
 ### Selection/drop observation and scaling
-# I want to use log transformation so I decided to drop the observation with 0 death, it does not make sens to look for a 
-# for a pattern if there are no deaths. I also decided to put the population in million and covid case information in
-# 1000 persons
+# I want to use log transformation so I decided to drop the observation with 0 deaths. 
+# I also decided to put the population in million and covid case information in 1000 persons
 
 View( df_covid %>% filter( death==0) ) 
 # Drop if death is 0
@@ -93,6 +92,7 @@ df_covid_confirmed <- summarise(df_covid,
                                     max = max(x = confirmed),
                                     sd = sd(x = confirmed),
                                     skew = skewness(x = confirmed))
+
 df_covid_deaths <- summarise(df_covid,
                                 variable = "case of death",
                                 mean = mean(x = deaths),
@@ -109,7 +109,7 @@ kable(table_summary)
 #### Investigation of the transformation of my variable
 ## I will try the fourth models and choose the best fit.
 #
-#     my model : number of registered death = alpha + beta * number of registered case
+# my model : number of registered death = alpha + beta * number of registered case
 #
 # Test of log-transformation :
 #
@@ -148,24 +148,11 @@ ggplot( df_covid , aes(x = confirmed, y = deaths ))  +
   scale_x_continuous( trans = log_trans(),  breaks = c(1,2,5,10,20,50,100,200,500,1000,10000) )+
   scale_y_continuous( trans = log_trans(),breaks = c(1,2,5,10,20,50,100,200,500,1000,10000 ))
 
-####
-# Conclusions:
-#   1) taking log of gdptot is needed, but still non-linear pattern in data/need to use 'approximation' interpretation
-#     - feasible to check and we do it due to learn how to do it, 
-#           but in practice I would skip this -> over-complicates analysis
-#   2) using only gdppc is possible, but need to model the non-linearity in data
-#       - Substantive: Level changes is harder to interpret and our aim is not to get $ based comparison
-#       - Statistical: log transformation is way better approximation make simplification!
-#   3) taking log of gdppc is making the association close to linear!
-#   4) taking log for life-expectancy does not matter -> use levels!
-#       - Substantive: it does not give better interpretation
-#       - Statistical: you can compare models with the same y, no better fit
-#       - Remember: simplest the better!
 
 ### Conclusions :
 # I will use the fourth model : use Log transformation for both of my variable :
-## substantive reason : both of the variable are affected in multiplicatives ways, it's increased by a certain percentage
-## statistical reason : the distribution of the varibales are skewed with a long right tail
+## substantive reason : both of the variable are affected in multiplicative ways, it's increased by a certain percentage
+## statistical reason : the distribution of the variable are skewed with a long right tail
 ## When I compare all the transformation, it make sens to choose the log-log
 
 
