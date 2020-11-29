@@ -5,7 +5,7 @@ Maeva Braeckevelt
 This analysis aimed at analyzing the pattern of association between registered COVID-19 cases and registered death due to COVID-19 until the 26 October 2020 among countries.
 
 # Analytic plan #
-In this folder, there is four folders required for the data analysis et coding project.
+In this folder, there are four folders required for the data analysis et coding project.
 
 ## Codes
 * This folder contains R scripts and 2 Rmarkdown used to create my analysis about Covid-19
