@@ -19,7 +19,7 @@ cv <- read_csv(paste0(my_path_covid))
 my_path_pop <- "https://raw.githubusercontent.com/Maeva2408/DA2_Assignement/main/Data/Raw/pop_WDI_2019.csv"
 pop <- read_csv(paste0(my_path_pop))
 
-CV
+
 ####
 # COVID DATA CLEANING
 #
